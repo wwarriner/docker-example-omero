@@ -9,9 +9,10 @@ services:
       POSTGRES_PASSWORD: omero
     networks:
       - omero
+    restart: always
     volumes:
       - type: bind
-        source: "D:/omero_db"
+        source: "/var/lib/postgresql/data"
         target: "/var/lib/postgresql/data"
 
   omeroserver:
@@ -27,9 +28,10 @@ services:
     ports:
       - "4063:4063"
       - "4064:4064"
+    restart: always
     volumes:
       - type: bind
-        source: "D:/omero_files"
+        source: "/OMERO"
         target: "/OMERO"
 
   omeroweb:
@@ -40,6 +42,7 @@ services:
       - omero
     ports:
       - "4080:4080"
+    restart: always
 
 networks:
   omero:
