@@ -4,23 +4,20 @@ services:
   database:
     image: "postgres:11"
     environment:
-      POSTGRES_USER: omero
+      POSTGRES_USER: postgres
       POSTGRES_DB: omero
       POSTGRES_PASSWORD: omero@volker_370
-      PGDATA: /tmp
     networks:
       - omero
-    restart: always
+    user: postgres
     volumes:
-      - type: bind
-        source: "/var/lib/postgresql/data"
-        target: "/var/lib/postgresql/data"
+      - omero_postgres_db:/var/lib/postgresql/data
 
   omeroserver:
     image: "openmicroscopy/omero-server:5.6.2"
     environment:
       CONFIG_omero_db_host: database
-      CONFIG_omero_db_user: omero
+      CONFIG_omero_db_user: postgres
       CONFIG_omero_db_pass: omero@volker_370
       CONFIG_omero_db_name: omero
       ROOTPASS: omero@volker_370
@@ -29,11 +26,8 @@ services:
     ports:
       - "4063:4063"
       - "4064:4064"
-    restart: always
     volumes:
-      - type: bind
-        source: "/OMERO"
-        target: "/OMERO"
+      - /home/vagrant/data:/OMERO
 
   omeroweb:
     image: "openmicroscopy/omero-web-standalone:5.6.2"
@@ -43,7 +37,9 @@ services:
       - omero
     ports:
       - "4080:4080"
-    restart: always
 
 networks:
   omero:
+
+volumes:
+  omero_postgres_db:

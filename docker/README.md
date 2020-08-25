@@ -18,4 +18,4 @@ The initial password can be changed in [`docker-compose.yml`](docker-compose.yml
 
 For more configuration options see:
 - https://github.com/ome/omero-server-docker/blob/master/README.md
-- https://github.com/ome/omero-web-docker/blob/master/README.md
+- https://github.com/ome/omero-web-docker/blob/master/READM
