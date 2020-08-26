@@ -18,10 +18,17 @@ Vagrant.configure("2") do |config|
         omero.vm.synced_folder "docker/", "/home/vagrant/docker", type: "virtualbox", automount: true
         omero.vm.synced_folder "scripts/", "/home/vagrant/scripts", type: "virtualbox", automount: true
         omero.trigger.after :up, :reload do |trigger|
+            trigger.name = "Startup"
             trigger.run_remote = {path: "startup.sh"}
         end
-        omero.trigger.before :halt, :suspend, :reload, :destroy do |trigger|
+        omero.trigger.before :halt, :suspend, :reload do |trigger|
+            trigger.name = "Shutdown"
             trigger.run_remote = {path: "shutdown.sh"}
+        end
+        omero.trigger.before :destroy do |trigger|
+            trigger.name = "Shutdown (destroy)"
+            trigger.run_remote = {path: "shutdown.sh"}
+            trigger.on_error = :continue
         end
     end
 end
