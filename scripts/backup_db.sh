@@ -1,8 +1,12 @@
-db="/home/vagrant/db"
-date="`date +"%Y%m%d-%H%M%S"`"
-filename="db-$date.tar.gz"
-pg="/var/lib/docker/volumes/docker_omero_postgres_db/_data/"
+source /home/vagrant/scripts/utils.sh
 
-tar -czvf "/tmp/$filename" -C "$pg" .
-rsync -avhW --no-compress "/tmp/$filename" "$db/$filename"
-rm "/tmp/$filename"
+tarfile="$(get_tarfile)"
+dumpfile="$(get_dumpfile)"
+
+echo "Dumping $tarfile"
+echo "Container $(get_container_id)"
+docker exec -t "$(get_container_id)" pg_dumpall -h 0.0.0.0 -c -U postgres > "/tmp/$dumpfile"
+tar -czvf "/tmp/$tarfile" -C "/tmp" "$dumpfile"
+rsync -avhW --no-compress "/tmp/$tarfile" "$(get_db_folder)/$tarfile"
+rm "/tmp/$tarfile"
+rm "/tmp/$dumpfile"

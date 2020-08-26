@@ -1,12 +1,15 @@
-db="/home/vagrant/db"
-filename="`ls -t ${db} | head -n1`"
-pg="/var/lib/docker/volumes/docker_omero_postgres_db/_data"
+source /home/vagrant/scripts/utils.sh
 
-if ! [ -z "$filename" ]
+tarfile="$(get_most_recent_tarfile "$(get_db_folder)")"
+
+if ! [ -z "$tarfile" ]
 then
-    echo "Restoring $filename"
-    rsync -avhW --no-compress "$db/$filename" "/tmp/$filename"
-    rm -rfv "$pg/{*,.*}"
-    tar -xzvf "/tmp/$filename" -C "$pg"
-    rm "/tmp/$filename"
+    echo "Restoring $tarfile"
+    echo "Container $(get_container_id)"
+    dumpfile="$(get_dumpfile)"
+    rsync -avhW --no-compress "$(get_db_folder)/$tarfile" "/tmp/$tarfile"
+    tar -xzvf "/tmp/$tarfile" -C "/tmp" "$dumpfile"
+    cat "/tmp/$dumpfile" | docker exec -i "$(get_container_id)" psql -h 0.0.0.0 -U postgres
+    rm "/tmp/$tarfile"
+    rm "/tmp/$dumpfile"
 fi
