@@ -2,6 +2,7 @@
 yum update -y
 yum install -y yum-utils
 yum install -y rsync
+yum install -y pcre-tools
 
 # setup docker
 yum-config-manager \
@@ -24,6 +25,14 @@ ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 cd /home/vagrant/scripts
 chmod a+x backup_db.sh
 chmod a+x restore_db.sh
+
+# setup db backup service
+tempfile=$(mktemp)
+crontab -l > $tempfile
+echo "00 0,3,6,9,12,15,18,21 * * * /home/vagrant/scripts/backup_db.sh" >> $tempfile # backups every 3 hours
+crontab $tempfile
+crontab -l
+rm $tempfile
 
 # start
 cd /home/vagrant/docker
